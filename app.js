@@ -8,6 +8,10 @@ const SpotifyWebApi = require('spotify-web-api-node');
 
 const app = express();
 
+const bodyParser = require('body-parser');
+
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.set('view engine', 'hbs');
 app.set('views', __dirname + '/views');
 app.use(express.static(__dirname + '/public'));
@@ -32,6 +36,25 @@ const getArtist = async (req, res) => {
   try {
   
     const artist = req.query.artist;
+    
+    const data = await spotifyApi.searchArtists(artist);
+
+    
+
+    res.render('artist-search-results', data.body.artists.items);
+
+  } catch (err) {
+    console.log('The error while searching artists occurred: ', err)
+  }
+
+
+}
+
+const postArtist = async (req, res) => {
+  
+  try {
+    console.log(req.body.artist)
+    const artist = "Beatles";
     
     const data = await spotifyApi.searchArtists(artist);
 
@@ -100,6 +123,10 @@ app.get('/', (req, res, next) => {
 app.get('/artist-search', (req, res, next) => {
     getArtist(req, res);
   });
+
+app.post('/artist-search', (req, res, next) => {
+  postArtist(req, res);
+});
 
 
 app.get('/albums/:artistId', (req, res, next) => {
